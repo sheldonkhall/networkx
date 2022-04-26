@@ -918,3 +918,25 @@ class TestSimilarity:
 
         print("Starting G3 to G2 GED calculation")
         assert nx.graph_edit_distance(G3, G2, node_match=match, edge_match=match) == 1
+
+    def test_symmetry_with_custom_matching_more_complex(self):
+        a = ["A", "A", "B"]
+        b = ["C", "A", "B"]
+        G2 = nx.Graph()
+        G2.add_nodes_from(a)
+        G2.add_edges_from([(x, y) for x, y in zip(a[:-1], a[1:])])
+        G3 = nx.Graph()
+        G3.add_nodes_from(b)
+        G3.add_edges_from([(x, y) for x, y in zip(b[:-1], b[1:])])
+        for G in (G2, G3):
+            for n in G:
+                G.nodes[n]["attr"] = n
+            for e in G.edges:
+                G.edges[e]["attr"] = e
+        match = lambda x, y: x == y
+
+        print("Starting G2 to G3 GED calculation")
+        assert nx.graph_edit_distance(G2, G3, node_match=match, edge_match=match) == 3
+
+        print("Starting G3 to G2 GED calculation")
+        assert nx.graph_edit_distance(G3, G2, node_match=match, edge_match=match) == 3
